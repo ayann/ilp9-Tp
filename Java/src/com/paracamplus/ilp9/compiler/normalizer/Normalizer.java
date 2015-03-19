@@ -16,6 +16,7 @@ import java.util.Vector;
 import com.paracamplus.ilp9.compiler.CompilationException;
 import com.paracamplus.ilp9.compiler.ast.ASTClocalFunctionVariable;
 import com.paracamplus.ilp9.compiler.interfaces.IASTCblock;
+import com.paracamplus.ilp9.compiler.interfaces.IASTCcase;
 import com.paracamplus.ilp9.compiler.interfaces.IASTCclassDefinition;
 import com.paracamplus.ilp9.compiler.interfaces.IASTCfunctionDefinition;
 import com.paracamplus.ilp9.compiler.interfaces.IASTCglobalFunctionVariable;
@@ -30,6 +31,8 @@ import com.paracamplus.ilp9.interfaces.IASTbinaryOperation;
 import com.paracamplus.ilp9.interfaces.IASTblock;
 import com.paracamplus.ilp9.interfaces.IASTblock.IASTbinding;
 import com.paracamplus.ilp9.interfaces.IASTboolean;
+import com.paracamplus.ilp9.interfaces.IASTcase;
+import com.paracamplus.ilp9.interfaces.IASTcase.IASTswitch;
 import com.paracamplus.ilp9.interfaces.IASTclassDefinition;
 import com.paracamplus.ilp9.interfaces.IASTcodefinitions;
 import com.paracamplus.ilp9.interfaces.IASTexpression;
@@ -215,6 +218,29 @@ public class Normalizer implements
     public IASTexpression visit(IASToperator iast, INormalizationEnvironment env)
             throws CompilationException {
         throw new RuntimeException("Already processed via Operation");
+    }
+    
+    public IASTexpression visit(IASTcase iast, INormalizationEnvironment env)
+            throws CompilationException {
+    	
+    	INormalizationEnvironment newenv = env;
+        IASTswitch[] switchs = iast.getSwitchs();
+        IASTCcase.IASTCswitch[] newswitchs = 
+                new IASTCcase.IASTCswitch[switchs.length];
+        for ( int i=0 ; i<switchs.length ; i++ ) {
+            IASTswitch s = switchs[i];
+            IASTexpression cond = s.getCondition().accept(this, env);
+            IASTexpression cons = s.getConsequence().accept(this, env);
+            IASTexpression newcond = cond.accept(this, env);
+            IASTexpression newcons= cons.accept(this, env);
+            IASTvariable variable = s.getVariable();
+            IASTvariable newvariable = 
+                    factory.newLocalVariable(variable.getName());
+            newenv = newenv.extend(variable, newvariable);
+            newswitchs[i] = factory.newSwitch(cond, cons, newvariable);
+        }
+        IASTexpression newAlternant = iast.getAlternant().accept(this, newenv);
+        return factory.newCase(newswitchs, newAlternant);
     }
 
     public IASTexpression visit(IASTblock iast, INormalizationEnvironment env)

@@ -15,6 +15,7 @@ import com.paracamplus.ilp9.interfaces.IASTbinaryOperation;
 import com.paracamplus.ilp9.interfaces.IASTblock;
 import com.paracamplus.ilp9.interfaces.IASTblock.IASTbinding;
 import com.paracamplus.ilp9.interfaces.IASTboolean;
+import com.paracamplus.ilp9.interfaces.IASTcase;
 import com.paracamplus.ilp9.interfaces.IASTclassDefinition;
 import com.paracamplus.ilp9.interfaces.IASTcodefinitions;
 import com.paracamplus.ilp9.interfaces.IASTexpression;
@@ -407,4 +408,11 @@ implements IASTvisitor<Object, ILexicalEnvironment, EvaluationException> {
          IMethod supermethod = isci.getSuperMethod();
          return supermethod.apply(this, isci.getArguments());
     }
+
+	@Override
+	public Object visit(IASTcase iast, ILexicalEnvironment data)
+			throws EvaluationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

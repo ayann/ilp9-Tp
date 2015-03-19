@@ -8,6 +8,8 @@ package com.paracamplus.ilp9.compiler.normalizer;
 
 import com.paracamplus.ilp9.compiler.CompilationException;
 import com.paracamplus.ilp9.compiler.interfaces.IASTCblock;
+import com.paracamplus.ilp9.compiler.interfaces.IASTCcase;
+import com.paracamplus.ilp9.compiler.interfaces.IASTCcase.IASTCswitch;
 import com.paracamplus.ilp9.compiler.interfaces.IASTCclassDefinition;
 import com.paracamplus.ilp9.compiler.interfaces.IASTCcodefinitions;
 import com.paracamplus.ilp9.compiler.interfaces.IASTCfunctionDefinition;
@@ -94,6 +96,13 @@ import com.paracamplus.ilp9.interfaces.IASTvariable;
 
      IASTCblock.IASTCbinding newBinding(IASTvariable variable, 
                                         IASTexpression initialisation);
+     
+     IASTCcase newCase(IASTCcase.IASTCswitch[] switchs,
+             IASTexpression alternant);
+
+     IASTCcase.IASTCswitch newSwitch(IASTexpression condition,
+             						IASTexpression consequence,
+             						IASTvariable variable);
 
      IASTexpression newLoop(IASTexpression condition, 
                                   IASTexpression body);
@@ -147,4 +156,5 @@ import com.paracamplus.ilp9.interfaces.IASTvariable;
                             IASTexpression[] arguments);
     
      IASTexpression newSuper();
+
 }

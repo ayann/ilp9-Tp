@@ -30,6 +30,8 @@ import com.paracamplus.ilp9.interfaces.IASTbinaryOperation;
 import com.paracamplus.ilp9.interfaces.IASTblock;
 import com.paracamplus.ilp9.interfaces.IASTblock.IASTbinding;
 import com.paracamplus.ilp9.interfaces.IASTboolean;
+import com.paracamplus.ilp9.interfaces.IASTcase;
+import com.paracamplus.ilp9.interfaces.IASTcase.IASTswitch;
 import com.paracamplus.ilp9.interfaces.IASTcodefinitions;
 import com.paracamplus.ilp9.interfaces.IASTexpression;
 import com.paracamplus.ilp9.interfaces.IASTfieldRead;
@@ -184,6 +186,17 @@ implements IASTCvisitor<Set<IASTCglobalVariable>,
             result = binding.getInitialisation().accept(this, result);
         }
         result = iast.getBody().accept(this, result);
+        return result;
+    }
+    public Set<IASTCglobalVariable> visit(
+            IASTcase iast,
+            Set<IASTCglobalVariable> result) 
+                    throws CompilationException {
+        for ( IASTswitch switchs : iast.getSwitchs() ) {
+            result = switchs.getCondition().accept(this, result);
+            result = switchs.getConsequence().accept(this, result);
+        }
+        result = iast.getAlternant().accept(this, result);
         return result;
     }
        

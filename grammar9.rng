@@ -50,7 +50,27 @@
       <ref name="invocation"/>
       <ref name="codefinitions"/>
       <ref name="lambda"/>
+      <ref name="case"/>
     </choice>
+  </define>
+  <define name="case">
+    <element name="case">
+      <zeroOrMore>
+        <element name="switch">
+          <element name="condition">
+            <ref name="expression"/>
+          </element>
+          <element name="consequence">
+            <ref name="expression"/>
+          </element>
+        </element>
+      </zeroOrMore>
+      <element name="alternant">
+        <oneOrMore>
+          <ref name="expression"/>
+        </oneOrMore>
+      </element>
+    </element>
   </define>
   <define name="alternative">
     <element name="alternative">

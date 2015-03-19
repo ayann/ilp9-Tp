@@ -51,6 +51,8 @@ import com.paracamplus.ilp9.interfaces.IASTbinaryOperation;
 import com.paracamplus.ilp9.interfaces.IASTblock;
 import com.paracamplus.ilp9.interfaces.IASTblock.IASTbinding;
 import com.paracamplus.ilp9.interfaces.IASTboolean;
+import com.paracamplus.ilp9.interfaces.IASTcase;
+import com.paracamplus.ilp9.interfaces.IASTcase.IASTswitch;
 import com.paracamplus.ilp9.interfaces.IASTcodefinitions;
 import com.paracamplus.ilp9.interfaces.IASTexpression;
 import com.paracamplus.ilp9.interfaces.IASTfieldRead;
@@ -447,6 +449,92 @@ implements IASTCvisitor<Void, Compiler.Context, CompilationException> {
         return null;
     }
     
+    public Void visit(IASTcase iast, Context context) throws CompilationException {
+    	emit("{ \n");
+        IASTswitch[] switchs = iast.getSwitchs();
+        IASTvariable[] tmps = new IASTvariable[switchs.length];
+        for ( int i=0 ; i<switchs.length ; i++ ) {
+            IASTvariable tmp = context.newTemporaryVariable();
+            emit("  ILP_Object " + tmp.getMangledName() + "; \n");
+            tmps[i] = tmp;
+        }
+        for ( int i=0 ; i<switchs.length ; i++ ) {
+            IASTswitch s = switchs[i];
+            IASTvariable tmp = tmps[i];
+            Context c = context.redirect(new AssignDestination(tmp));
+            s.getCondition().accept(this, c);
+            s.getConsequence().accept(this, c);
+        }
+        emit("\n  {\n");
+        for ( int i=0 ; i<switchs.length ; i++ ) {
+            IASTswitch s = switchs[i];
+            IASTvariable tmp = tmps[i];
+            IASTvariable variable = s.getVariable();
+            emit("    ILP_Object ");
+            emit(variable.getMangledName());
+            emit(" = ");
+            if ( variable instanceof IASTClocalVariable ) {
+                IASTClocalVariable lv = (IASTClocalVariable) variable;
+                if ( lv.isClosed() ) {
+                    emit("ILP_Value2Box(");
+                    emit(tmp.getMangledName());
+                    emit(")");
+                } else {
+                    emit(tmp.getMangledName());
+                }
+            } else {
+                emit(tmp.getMangledName());
+            }
+            emit(";\n");
+        }
+        iast.getAlternant().accept(this, context);
+        emit("\n  }\n}\n");
+        return null;
+    }
+    
+    public Void visit(IASTblock iast, Context context)
+            throws CompilationException {
+        emit("{ \n");
+        IASTbinding[] bindings = iast.getBindings();
+        IASTvariable[] tmps = new IASTvariable[bindings.length];
+        for ( int i=0 ; i<bindings.length ; i++ ) {
+            IASTvariable tmp = context.newTemporaryVariable();
+            emit("  ILP_Object " + tmp.getMangledName() + "; \n");
+            tmps[i] = tmp;
+        }
+        for ( int i=0 ; i<bindings.length ; i++ ) {
+            IASTbinding binding = bindings[i];
+            IASTvariable tmp = tmps[i];
+            Context c = context.redirect(new AssignDestination(tmp));
+            binding.getInitialisation().accept(this, c);
+        }
+        emit("\n  {\n");
+        for ( int i=0 ; i<bindings.length ; i++ ) {
+            IASTbinding binding = bindings[i];
+            IASTvariable tmp = tmps[i];
+            IASTvariable variable = binding.getVariable();
+            emit("    ILP_Object ");
+            emit(variable.getMangledName());
+            emit(" = ");
+            if ( variable instanceof IASTClocalVariable ) {
+                IASTClocalVariable lv = (IASTClocalVariable) variable;
+                if ( lv.isClosed() ) {
+                    emit("ILP_Value2Box(");
+                    emit(tmp.getMangledName());
+                    emit(")");
+                } else {
+                    emit(tmp.getMangledName());
+                }
+            } else {
+                emit(tmp.getMangledName());
+            }
+            emit(";\n");
+        }
+        iast.getBody().accept(this, context);
+        emit("\n  }\n}\n");
+        return null;
+    }
+    
     public Void visit(IASTassignment iast, Context context)
             throws CompilationException {
         if ( iast.getVariable() instanceof IASTClocalVariable ) {
@@ -498,48 +586,7 @@ implements IASTCvisitor<Void, Compiler.Context, CompilationException> {
         return null;
     }
     
-    public Void visit(IASTblock iast, Context context)
-            throws CompilationException {
-        emit("{ \n");
-        IASTbinding[] bindings = iast.getBindings();
-        IASTvariable[] tmps = new IASTvariable[bindings.length];
-        for ( int i=0 ; i<bindings.length ; i++ ) {
-            IASTvariable tmp = context.newTemporaryVariable();
-            emit("  ILP_Object " + tmp.getMangledName() + "; \n");
-            tmps[i] = tmp;
-        }
-        for ( int i=0 ; i<bindings.length ; i++ ) {
-            IASTbinding binding = bindings[i];
-            IASTvariable tmp = tmps[i];
-            Context c = context.redirect(new AssignDestination(tmp));
-            binding.getInitialisation().accept(this, c);
-        }
-        emit("\n  {\n");
-        for ( int i=0 ; i<bindings.length ; i++ ) {
-            IASTbinding binding = bindings[i];
-            IASTvariable tmp = tmps[i];
-            IASTvariable variable = binding.getVariable();
-            emit("    ILP_Object ");
-            emit(variable.getMangledName());
-            emit(" = ");
-            if ( variable instanceof IASTClocalVariable ) {
-                IASTClocalVariable lv = (IASTClocalVariable) variable;
-                if ( lv.isClosed() ) {
-                    emit("ILP_Value2Box(");
-                    emit(tmp.getMangledName());
-                    emit(")");
-                } else {
-                    emit(tmp.getMangledName());
-                }
-            } else {
-                emit(tmp.getMangledName());
-            }
-            emit(";\n");
-        }
-        iast.getBody().accept(this, context);
-        emit("\n  }\n}\n");
-        return null;
-    }
+    
     
     public Void visit(IASTinvocation iast, Context context)
             throws CompilationException {

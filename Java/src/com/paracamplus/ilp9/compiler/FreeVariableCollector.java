@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import com.paracamplus.ilp9.compiler.interfaces.IASTCblock;
+import com.paracamplus.ilp9.compiler.interfaces.IASTCcase;
 import com.paracamplus.ilp9.compiler.interfaces.IASTCcodefinitions;
 import com.paracamplus.ilp9.compiler.interfaces.IASTCcomputedInvocation;
 import com.paracamplus.ilp9.compiler.interfaces.IASTCfieldRead;
@@ -35,6 +36,7 @@ import com.paracamplus.ilp9.interfaces.IASTassignment;
 import com.paracamplus.ilp9.interfaces.IASTbinaryOperation;
 import com.paracamplus.ilp9.interfaces.IASTblock;
 import com.paracamplus.ilp9.interfaces.IASTboolean;
+import com.paracamplus.ilp9.interfaces.IASTcase;
 import com.paracamplus.ilp9.interfaces.IASTcodefinitions;
 import com.paracamplus.ilp9.interfaces.IASTexpression;
 import com.paracamplus.ilp9.interfaces.IASTfieldRead;
@@ -227,6 +229,30 @@ implements IASTCvisitor<Void, Set<IASTClocalVariable>, CompilationException> {
         } catch (ClassCastException exc) {
             throw new RuntimeException("should not occur");
         }
+        variables.addAll(newvars);
+        return null;
+    }
+    
+    public Void visit(IASTcase iast, Set<IASTClocalVariable> variables) 
+            throws CompilationException {
+        if ( iast instanceof IASTCcase ) {
+            return visit((IASTCcase) iast, variables);
+        } else {
+            throw new RuntimeException("should not occur");
+        }
+    }
+    
+    public Void visit(IASTCcase iast, Set<IASTClocalVariable> variables) 
+            throws CompilationException {
+        Set<IASTClocalVariable> currentVars = new HashSet<>();
+        for ( IASTCcase.IASTCswitch switchs : iast.getSwitchs() ) {
+            switchs.getCondition().accept(this, variables);
+            switchs.getConsequence().accept(this, variables);
+            currentVars.add(switchs.getVariable());
+        }
+        Set<IASTClocalVariable> newvars = new HashSet<>();
+        iast.getAlternant().accept(this, newvars);
+        newvars.removeAll(currentVars);
         variables.addAll(newvars);
         return null;
     }

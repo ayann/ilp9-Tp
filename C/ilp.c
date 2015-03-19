@@ -875,6 +875,17 @@ ILP_newline ()
      return ILP_FALSE;
 }
 
+ILP_Object
+ILP_atoi (ILP_Object o1) 
+{
+	if (ILP_isString(o1)){
+		int nombre = atoi( o1->_content.asString.asCharacter);
+		
+		return ILP_make_integer(nombre);
+    }
+    return ILP_domain_error("Not a string", o1);
+}
+
 /** Print an instance */
 
 void

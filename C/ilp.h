@@ -358,7 +358,7 @@ extern struct ILP_Class ILP_object_Exception_class;
 extern struct ILP_Field ILP_object_super_field;
 extern struct ILP_Field ILP_object_defining_class_field;
 extern struct ILP_Field ILP_object_value_field;
-extern struct ILP_Method ILP_object_print_method;
+extern struct ILP_Method ILP_object__method;
 extern struct ILP_Method ILP_object_classOf_method;
 
 /** Primitives. */
@@ -388,6 +388,7 @@ extern ILP_Object ILP_and (ILP_Object o1, ILP_Object o2);
 extern ILP_Object ILP_or (ILP_Object o1, ILP_Object o2);
 extern ILP_Object ILP_xor (ILP_Object o1, ILP_Object o2);
 extern ILP_Object ILP_newline ();
+extern ILP_Object ILP_atoi (ILP_Object o1);
 extern ILP_Object ILP_print (ILP_Object self);
 extern ILP_Object ILPm_print (ILP_Closure useless, ILP_Object self);
 extern ILP_Object ILP_classOf (ILP_Object self);

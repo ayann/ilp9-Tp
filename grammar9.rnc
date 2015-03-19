@@ -28,6 +28,15 @@ expression =
  | invocation
  | codefinitions
  | lambda
+ | case
+
+case = element case {
+   element switch {
+	 element condition { expression },
+	 element consequence { expression }
+   } *,
+   element alternant { expression + }
+}
 
 alternative = element alternative {
    element condition   { expression },

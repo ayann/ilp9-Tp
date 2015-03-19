@@ -25,6 +25,7 @@ import com.paracamplus.ilp9.ast.ASTtry;
 import com.paracamplus.ilp9.ast.ASTunaryOperation;
 import com.paracamplus.ilp9.compiler.CompilationException;
 import com.paracamplus.ilp9.compiler.ast.ASTCblock;
+import com.paracamplus.ilp9.compiler.ast.ASTCcase;
 import com.paracamplus.ilp9.compiler.ast.ASTCclassDefinition;
 import com.paracamplus.ilp9.compiler.ast.ASTCcodefinitions;
 import com.paracamplus.ilp9.compiler.ast.ASTCcomputedInvocation;
@@ -44,6 +45,7 @@ import com.paracamplus.ilp9.compiler.ast.ASTCnamedLambda;
 import com.paracamplus.ilp9.compiler.ast.ASTCprimitiveInvocation;
 import com.paracamplus.ilp9.compiler.ast.ASTCprogram;
 import com.paracamplus.ilp9.compiler.interfaces.IASTCblock;
+import com.paracamplus.ilp9.compiler.interfaces.IASTCcase;
 import com.paracamplus.ilp9.compiler.interfaces.IASTCclassDefinition;
 import com.paracamplus.ilp9.compiler.interfaces.IASTCcodefinitions;
 import com.paracamplus.ilp9.compiler.interfaces.IASTCcomputedInvocation;
@@ -203,6 +205,13 @@ implements INormalizationFactory {
     }
     public IASTCblock.IASTCbinding newBinding(IASTvariable variable, IASTexpression initialisation) {
         return new ASTCblock.ASTCbinding(variable, initialisation);
+    }
+    
+    public IASTCcase newCase(IASTCcase.IASTCswitch[] switchs, IASTexpression alternant) {
+        return new ASTCcase(switchs, alternant);
+    }
+    public IASTCcase.IASTCswitch newSwitch(IASTexpression condition, IASTexpression consequence, IASTvariable variable) {
+        return new ASTCcase.ASTCswitch(condition, consequence, variable);
     }
     
     public IASTexpression newLoop(IASTexpression condition, IASTexpression body) {

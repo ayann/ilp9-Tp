@@ -16,6 +16,8 @@ public class GlobalVariableStuff {
         env.addGlobalFunctionValue(
                 new Primitive("newline", "ILP_newline", 0));
         env.addGlobalFunctionValue(
+                new Primitive("stringToInt", "ILP_atoi", 1));
+        env.addGlobalFunctionValue(
                 new Primitive("throw", "ILP_throw", 1));
     }
 }
